@@ -1,0 +1,7 @@
+{
+  "name": "Epicollect5 Media Downloader",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}

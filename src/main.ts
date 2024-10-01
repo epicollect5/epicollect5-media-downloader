@@ -1,8 +1,10 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router';
+import {createApp} from 'vue';
+import App from '@/App.vue';
+import router from '@/router';
+import {createPinia} from 'pinia';
+import {PiniaLogger} from 'pinia-logger';
 
-import { IonicVue } from '@ionic/vue';
+import {IonicVue} from '@ionic/vue';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -33,11 +35,31 @@ import '@ionic/vue/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import * as IonComponents from '@ionic/vue';
 
-const app = createApp(App)
-  .use(IonicVue)
-  .use(router);
+
+if (import.meta.hot) {
+    import.meta.hot.on('vite:beforeUpdate', () => {
+        console.clear(); // Clear console on HMR
+    });
+}
+
+const pinia = createPinia();
+pinia.use(PiniaLogger({
+    expanded: true,
+    disabled: process.env.NODE_ENV === 'production'
+}));
+
+const app = createApp(App).use(IonicVue).use(router).use(pinia);
+
+// //register all Ionic components globally
+Object.keys(IonComponents).forEach((key) => {
+    if (/^Ion[A-Z]\w+$/.test(key)) {
+        app.component(key, IonComponents[key]);
+    }
+});
+
 
 router.isReady().then(() => {
-  app.mount('#app');
+    app.mount('#app');
 });
